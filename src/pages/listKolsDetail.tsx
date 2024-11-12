@@ -17,15 +17,10 @@ interface Kol {
 const ListKolsDetailPage: React.FunctionComponent = () => {
   const navigate = useNavigate();
 
-  const [openTab, setOpenTab] = useState<number>(2); // Default tab is Cục bông
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  // Define state with types
+  const [openTab, setOpenTab] = useState<number>(2);
   const [kols, setKols] = useState<Kol[]>([]);
   const [allKols, setAllKols] = useState<Kol[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(6);
-  const [searchTimeout, setSearchTimeout] = useState<ReturnType<
-    typeof setTimeout
-  > | null>(null);
 
   const handleBack = () => {
     navigate(-1);
@@ -34,13 +29,12 @@ const ListKolsDetailPage: React.FunctionComponent = () => {
   const fetchDataKols = async () => {
     try {
       const { data } = await axios.get(`${BaseURL}kollist/api/listvm/`);
+      console.log("Fetched KOLs data:", data.data); // Check if data is fetched
       setAllKols(data.data);
     } catch (error) {
-      console.error("Error fetching events:", error);
+      console.error("Error fetching KOLs:", error);
     }
   };
-
-  // console.log(allKols);
 
   const filterKols = (tabId: number) => {
     if (tabId === 2) {
@@ -58,37 +52,24 @@ const ListKolsDetailPage: React.FunctionComponent = () => {
     }
   };
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
   useEffect(() => {
     fetchDataKols();
   }, []);
 
   useEffect(() => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
+    if (allKols.length > 0) {
+      filterKols(openTab); // Apply filter based on default tab
     }
-    setSearchTimeout(
-      setTimeout(() => {
-        const filteredKols = allKols.filter((kol) =>
-          kol.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setKols(filteredKols);
-        filterKols(2);
-      }, 1000)
-    );
-
-    return () => {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout);
-      }
-    };
-  }, [searchTerm, allKols]);
+  }, [allKols, openTab]);
 
   const handleLoadMore = () => {
     setVisibleCount((prevCount) => prevCount + 6);
+  };
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const handleSearch = () => {
+    navigate(`/search?search=${encodeURIComponent(searchTerm)}`);
   };
 
   return (
@@ -118,7 +99,7 @@ const ListKolsDetailPage: React.FunctionComponent = () => {
       </div>
 
       <div className="p-4">
-        <form className="max-w-md mx-auto pb-[20px]">
+        <div className="max-w-md mx-auto pb-[20px]">
           <label
             htmlFor="default-search"
             className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -130,32 +111,34 @@ const ListKolsDetailPage: React.FunctionComponent = () => {
               type="search"
               id="default-search"
               value={searchTerm}
-              onChange={handleSearch}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-xl bg-gray-50 placeholder:text-[#000] focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Tìm kiếm"
               required
             />
-            <div className="text-white absolute end-1.5 bottom-[5px] bg-[#FF7991]  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-xl text-sm p-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-              >
-                <path
-                  d="M17.0413 16.4521L13.786 13.1968C14.7852 12.0575 15.3364 10.6159 15.3364 9.08643C15.3364 7.41691 14.6862 5.84749 13.5058 4.66707C12.3254 3.48665 10.7559 2.83643 9.08643 2.83643C7.41691 2.83643 5.84749 3.48665 4.66707 4.66707C3.48665 5.84749 2.83643 7.41691 2.83643 9.08643C2.83643 10.7559 3.48665 12.3254 4.66707 13.5058C5.84749 14.6862 7.41691 15.3364 9.08643 15.3364C10.6159 15.3364 12.0575 14.7852 13.1968 13.786L16.4521 17.0413C16.5335 17.1227 16.6401 17.1634 16.7467 17.1634C16.8534 17.1634 16.96 17.1227 17.0413 17.0413C17.2041 16.8786 17.2041 16.6149 17.0413 16.4521ZM5.25627 12.9166C4.23332 11.8934 3.66976 10.5332 3.66976 9.08643C3.66976 7.63969 4.23332 6.27942 5.25627 5.25627C6.27942 4.23332 7.63969 3.66976 9.08643 3.66976C10.5332 3.66976 11.8934 4.23332 12.9166 5.25627C13.9395 6.27942 14.5031 7.63969 14.5031 9.08643C14.5031 10.5332 13.9395 11.8934 12.9166 12.9166C11.8934 13.9395 10.5332 14.5031 9.08643 14.5031C7.63969 14.5031 6.27942 13.9395 5.25627 12.9166Z"
-                  fill="white"
-                />
-              </svg>
-            </div>
+            <button onClick={handleSearch}>
+              <div className="text-white absolute end-1.5 bottom-[28px] bg-[#FF7991]  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-xl text-sm p-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M17.0413 16.4521L13.786 13.1968C14.7852 12.0575 15.3364 10.6159 15.3364 9.08643C15.3364 7.41691 14.6862 5.84749 13.5058 4.66707C12.3254 3.48665 10.7559 2.83643 9.08643 2.83643C7.41691 2.83643 5.84749 3.48665 4.66707 4.66707C3.48665 5.84749 2.83643 7.41691 2.83643 9.08643C2.83643 10.7559 3.48665 12.3254 4.66707 13.5058C5.84749 14.6862 7.41691 15.3364 9.08643 15.3364C10.6159 15.3364 12.0575 14.7852 13.1968 13.786L16.4521 17.0413C16.5335 17.1227 16.6401 17.1634 16.7467 17.1634C16.8534 17.1634 16.96 17.1227 17.0413 17.0413C17.2041 16.8786 17.2041 16.6149 17.0413 16.4521ZM5.25627 12.9166C4.23332 11.8934 3.66976 10.5332 3.66976 9.08643C3.66976 7.63969 4.23332 6.27942 5.25627 5.25627C6.27942 4.23332 7.63969 3.66976 9.08643 3.66976C10.5332 3.66976 11.8934 4.23332 12.9166 5.25627C13.9395 6.27942 14.5031 7.63969 14.5031 9.08643C14.5031 10.5332 13.9395 11.8934 12.9166 12.9166C11.8934 13.9395 10.5332 14.5031 9.08643 14.5031C7.63969 14.5031 6.27942 13.9395 5.25627 12.9166Z"
+                    fill="white"
+                  />
+                </svg>
+              </div>
+            </button>
           </div>
-        </form>
+        </div>
 
         <div className="list-kols">
           <div className="page-1">
             <div className="max-w-md mx-auto">
-              <div className="mb-4 flex space-x-4 ">
+              <div className="mb-4 flex space-x-4">
                 <button
                   onClick={() => {
                     setOpenTab(2);
@@ -189,9 +172,9 @@ const ListKolsDetailPage: React.FunctionComponent = () => {
                 {kols.slice(0, visibleCount).map((kol, index) => (
                   <div
                     className="card-kols w-full rounded-xl flex flex-row"
-                    key={index}
+                    key={kol.id}
                   >
-                    <div className="max-w-[150px]">
+                    <div className="max-w-[150px] w-full aspect-square">
                       <img
                         className="w-full h-full rounded-xl"
                         src={`${BaseURL}${kol.photo}`}

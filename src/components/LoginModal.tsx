@@ -19,6 +19,8 @@ const LoginModal: React.FunctionComponen<{ onClose: () => void }> = ({
   const user = users.userInfo;
   const name = users.userInfo.name;
 
+  console.log("user", user);
+
   const login = async () => {
     try {
       getPhoneNumber({

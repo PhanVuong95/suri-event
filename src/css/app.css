@@ -215,7 +215,7 @@ body::-webkit-scrollbar {
 } */
 
 .card-kols {
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #ff7991;
   background: #fff;
   display: flex;

@@ -71,7 +71,7 @@ const TimeKeepingPage: React.FunctionComponent = () => {
 
   return (
     <Page className="h-100">
-      <div className="border-b pb-[28px] text-center pt-[65px] bg-white rounded-b-lg">
+      <div className="border-b pb-[28px] text-center pt-[20px] bg-white rounded-b-lg">
         <span className="text-black text-lg font-bold text-center">
           Tài Khoản
         </span>

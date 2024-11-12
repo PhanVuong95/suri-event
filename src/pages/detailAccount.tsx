@@ -39,7 +39,7 @@ const DetailAccountPage: React.FunctionComponent<PhoneProps> = (props) => {
       console.error("Error fetching event:", error);
     }
   };
-  // console.log(account);
+  console.log(account);
 
   return (
     <Page className="h-100">

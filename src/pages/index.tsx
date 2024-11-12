@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { List, Page, Icon, useNavigate, Slider } from "zmp-ui";
 import BannerPage from "../components/BannerPage";
 import UserCard from "../components/user-card";
@@ -9,6 +9,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { BaseURL } from "../configs/base-config";
 import { closeApp } from "zmp-sdk/apis";
+import { ProfileContext } from "../components/user_profile-context";
 
 interface Sponsor {
   id: number;
@@ -19,6 +20,11 @@ interface Sponsor {
 
 const HomePage: React.FunctionComponent = () => {
   const user = useRecoilValue(userState);
+
+  const profieContext = useContext<any>(ProfileContext);
+  const { userProfile, setUserProfile } = profieContext;
+
+  // console.log(user);
 
   const [sponsor, setSponsor] = useState<Sponsor[]>([]);
 
@@ -51,7 +57,7 @@ const HomePage: React.FunctionComponent = () => {
 
   return (
     <Page className="">
-      <UserCard user={user.userInfo} />
+      <UserCard user={userProfile?.userInfo} />
       <BannerPage />
       <div className="even-home">
         <div className="pt-4 flex items-center justify-between p-4">

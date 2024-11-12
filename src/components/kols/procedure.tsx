@@ -37,8 +37,18 @@ const ProcedurePage: React.FunctionComponent = (props) => {
         <h3 className="text-[#FF7991] text-base font-bold">Bước 1:</h3>
         <p className="text-[#000] text-base font-normal">
           Truy cập vào cổng bình chọn Biệt Đội KOLs Nhí 2024 qua mã QR code hoặc
-          qua đường link: ///
+          qua đường link:{" "}
+          <a
+            className="font-semibold text-[#FF7991]"
+            href="https://zalo.me/s/3969538154593994371/"
+          >
+            Suristore Events
+          </a>
         </p>
+        <img
+          src="https://dion.vn/wp-content/uploads/2024/09/qr-suri.png"
+          className="w-fwll aspect-square"
+        />
 
         <h3 className="text-[#FF7991] text-base font-bold">Bước 2:</h3>
         <p className="text-[#000] text-base font-normal">

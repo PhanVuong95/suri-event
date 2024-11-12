@@ -1,7 +1,7 @@
 .header-top-1 {
   width: 100%;
   flex-shrink: 0;
-  padding: 60px 16px 24px 16px;
+  padding: 20px 16px 24px 16px;
   border-radius: 0 0 12px 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   background: #fff;
@@ -192,6 +192,7 @@
 }
 
 .donors-home-card img {
+  max-height: 170px;
   width: 100%;
   height: auto;
 }
@@ -1032,8 +1033,6 @@ input[type="date"]:valid:before {
 
 .pagination {
   list-style: none;
-  width: 32px;
-  height: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1065,6 +1064,24 @@ input[type="date"]:valid:before {
   fill: #fff;
 }
 
+.pagination .page-index {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.pagination .page-index .page-index-p {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  border: 1px solid #ff7991;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .active {
   background: #ff7991 !important;
   color: #f5f5f5 !important;
@@ -1079,4 +1096,34 @@ input[type="date"]:valid:before {
   justify-content: center;
   align-items: center;
   margin-top: 2px;
+}
+
+#html5-qrcode-anchor-scan-type-change {
+  display: none !important;
+}
+
+#qr-reader__scan_region {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#html5-qrcode-select-camera {
+  display: none !important;
+}
+
+#qr-reader__dashboard_section_csr > span:nth-child(2) {
+  display: none !important;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 20px;
+  color: #000;
+}
+
+.loading-spinner::after {
+  content: "Loading...";
 }

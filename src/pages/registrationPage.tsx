@@ -1,11 +1,13 @@
 import axios from "axios";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { ProfileContext } from "../components/user_profile-context";
+
 import { useRecoilValue } from "recoil";
 import { userState } from "../state";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
 
 interface FormData {
   username: string;
@@ -26,8 +28,16 @@ interface Event {
 }
 
 const RegistrationPage: React.FunctionComponent = (props) => {
-  const { userInfo: user } = useRecoilValue(userState);
-  const nameProfile = user.name;
+  // const { userInfo: user } = useRecoilValue(userState);
+
+  const profieContext = useContext<any>(ProfileContext);
+  const { userProfile, setUserProfile } = profieContext;
+
+  console.log("user", userProfile?.userInfo.name);
+
+  const user = useRecoilValue(userState);
+
+  const nameProfile = user.userInfo.name;
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [event, setEvent] = useState<Event[]>([]);
@@ -61,21 +71,6 @@ const RegistrationPage: React.FunctionComponent = (props) => {
     }
     setValue("username", nameProfile);
   }, [setValue]);
-
-  useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.example.com/events/${id}`
-        );
-        setEvent(response.data);
-      } catch (error) {
-        console.error("Error fetching event:", error);
-      }
-    };
-
-    fetchEvent();
-  }, [id, setValue]);
 
   const onSubmit: SubmitHandler<FormData> = async (formData: FormData) => {
     const token = localStorage.token;

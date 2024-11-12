@@ -4,11 +4,10 @@ import axios from "axios";
 import { BaseURL } from "../configs/base-config";
 import moment from "moment";
 import ModalPage from "../components/modal";
-import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import ModalFalsePage from "../components/modalFalse";
 
-// Định nghĩa interface cho các kiểu dữ liệu
+// Define interfaces for data types
 interface KolsDetail {
   id: number;
   name: string;
@@ -28,18 +27,14 @@ interface HistoryKolsDetail {
 const KolsDetailPage: React.FunctionComponent = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [voteCount, setVoteCount] = useState<number>(0);
   const [kolsDetail, setKolsDetail] = useState<KolsDetail[]>([]);
   const [remainingVotes, setRemainingVotes] = useState<number>(0);
   const [historyKolsDetail, setHistoryKolsDetail] = useState<
     HistoryKolsDetail[]
   >([]);
+  const [totalHistoryCount, setTotalHistoryCount] = useState<number>(0); // New state for total count
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [modalIFalsesOpen, setModalIsFalsesOpen] = useState<boolean>(false);
-
-  // State for pagination
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const itemsPerPage = 10; // Number of items per page
 
   const handleBack = () => {
     navigate(-1);
@@ -63,11 +58,11 @@ const KolsDetailPage: React.FunctionComponent = () => {
     }
   };
 
+  console.log(kolsDetail[0]?.catagoryName);
+
   useEffect(() => {
     fetchKolsDetail();
   }, []);
-
-  // console.log(historyKolsDetail);
 
   useEffect(() => {
     const fetchRemainingVotes = async () => {
@@ -91,30 +86,31 @@ const KolsDetailPage: React.FunctionComponent = () => {
     fetchRemainingVotes();
   }, []);
 
+  const [pageIndex, setPageIndex] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
+  const fetchHistoryKolsDetail = async () => {
+    const token = localStorage.token;
+
+    try {
+      const { data } = await axios.get(
+        `https://checking-event.dion.vn/votingHistory/api/listPaging-history-vote-by-id/${id}?pageIndex=${pageIndex}&pageSize=${pageSize}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setHistoryKolsDetail(data.data[0] || []);
+      setTotalHistoryCount(data.totalCount || 0); // Set total count from response
+    } catch (error) {
+      console.error("Error fetching event:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchHistoryKolsDetail = async () => {
-      const token = localStorage.token;
-
-      try {
-        const { data } = await axios.get(
-          `https://checking-event.dion.vn/votingHistory/api/get-history-vote-by-id/${id}?page=${
-            currentPage + 1
-          }&limit=${itemsPerPage}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        // Lấy dữ liệu từ data.data[0] vì nó là mảng chứa mảng
-        setHistoryKolsDetail(data.data[0] || []);
-      } catch (error) {
-        console.error("Error fetching event:", error);
-      }
-    };
-
     fetchHistoryKolsDetail();
-  }, [id, currentPage]);
+  }, [id, pageIndex, pageSize]);
 
   const handleVote = async () => {
     const token = localStorage.token;
@@ -134,7 +130,6 @@ const KolsDetailPage: React.FunctionComponent = () => {
 
       if (response.ok) {
         setModalIsOpen(true);
-        // setRemainingVotes((prev) => prev - 1);
       } else {
         console.error("Error voting: không thành công");
         setModalIsFalsesOpen(true);
@@ -147,12 +142,7 @@ const KolsDetailPage: React.FunctionComponent = () => {
   const closeModal = () => {
     setModalIsOpen(false);
     setModalIsFalsesOpen(false);
-
     window.location.reload();
-  };
-
-  const handlePageClick = (data: { selected: number }) => {
-    setCurrentPage(data.selected);
   };
 
   const formatDate = (dateString: string) => {
@@ -165,9 +155,13 @@ const KolsDetailPage: React.FunctionComponent = () => {
     }
   };
 
-  const pageCount = Math.ceil(historyKolsDetail.length / itemsPerPage);
+  const handleNextPage = () => {
+    setPageIndex((prev) => prev + 1);
+  };
 
-  // console.log(kolsDetail);
+  const handlePreviousPage = () => {
+    setPageIndex((prev) => (prev > 1 ? prev - 1 : 1));
+  };
 
   return (
     <div>
@@ -252,12 +246,14 @@ const KolsDetailPage: React.FunctionComponent = () => {
                   <Link to="/procedure" className="kols-detail-bop-button-1">
                     Xem quy trình bình chọn
                   </Link>
-                  <button
-                    className="kols-detail-bop-button-2"
-                    onClick={handleVote}
-                  >
-                    Bình chọn ngay (Còn lại: {remainingVotes}/3)
-                  </button>
+                  {kolsDetail[0]?.catagoryName !== "KOLs Nhí" && (
+                    <button
+                      className="kols-detail-bop-button-2"
+                      onClick={handleVote}
+                    >
+                      Bình chọn ngay (Còn lại: {remainingVotes}/3)
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -269,16 +265,16 @@ const KolsDetailPage: React.FunctionComponent = () => {
 
           <div className="relative overflow-x-auto">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
-              <thead className="text-base bg-[#FF7991] font-normal text-white">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
                 <tr>
-                  <th scope="col" className="p-1.5">
+                  <th scope="col" className="px-2 py-3">
                     STT
                   </th>
-                  <th scope="col" className="p-1.5">
-                    Người bình chọn
+                  <th scope="col" className="px-6 py-3">
+                    Tên tài khoản
                   </th>
-                  <th scope="col" className="p-1.5">
-                    Thời gian
+                  <th scope="col" className="px-6 py-3">
+                    Thời gian bình chọn
                   </th>
                 </tr>
               </thead>
@@ -294,7 +290,7 @@ const KolsDetailPage: React.FunctionComponent = () => {
                       scope="row"
                       className="p-[10px] font-normal text-sm text-[#000] whitespace-nowrap"
                     >
-                      {index + 1 + currentPage * itemsPerPage}
+                      {index + 1}
                     </th>
                     <td className="p-[10px] font-normal text-sm text-[#000] overflow-hidden text-ellipsis whitespace-nowrap max-w-[160px] min-w-[138px]">
                       {item.accountName}
@@ -307,46 +303,44 @@ const KolsDetailPage: React.FunctionComponent = () => {
               </tbody>
             </table>
           </div>
-
-          <div className="list-data-1 flex justify-center mt-4">
-            <ReactPaginate
-              breakLabel={"..."}
-              pageCount={pageCount}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
-              onPageChange={handlePageClick}
-              containerClassName={"pagination"}
-              activeClassName={"active"}
-              pageClassName={"page"}
-              previousLabel={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="17"
-                  viewBox="0 0 16 17"
-                  fill="none"
-                >
-                  <path
-                    d="M9.99999 4.42673L9.99999 11.8734C10.0008 12.0058 9.96208 12.1355 9.88888 12.2458C9.81568 12.3562 9.71127 12.4422 9.58898 12.493C9.46668 12.5438 9.33203 12.557 9.2022 12.5309C9.07237 12.5049 8.95324 12.4408 8.85999 12.3467L5.13999 8.62007C5.01582 8.49516 4.94613 8.32619 4.94613 8.15007C4.94613 7.97394 5.01582 7.80498 5.13999 7.68007L8.85999 3.9534C8.95324 3.85938 9.07237 3.79526 9.2022 3.76921C9.33203 3.74317 9.46668 3.75638 9.58898 3.80715C9.71127 3.85793 9.81568 3.94398 9.88888 4.05433C9.96208 4.16467 10.0008 4.29432 9.99999 4.42673Z"
-                    fill="#FF7991"
-                  />
-                </svg>
-              }
-              nextLabel={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="17"
-                  viewBox="0 0 16 17"
-                  fill="none"
-                >
-                  <path
-                    d="M6.00001 12.2666V4.81996C5.99924 4.68754 6.03792 4.5579 6.11112 4.44755C6.18432 4.3372 6.28873 4.25116 6.41102 4.20038C6.53332 4.1496 6.66797 4.13639 6.7978 4.16244C6.92763 4.18848 7.04676 4.25261 7.14001 4.34662L10.86 8.07329C10.9842 8.1982 11.0539 8.36717 11.0539 8.54329C11.0539 8.71942 10.9842 8.88838 10.86 9.01329L7.14001 12.74C7.04676 12.834 6.92763 12.8981 6.7978 12.9241C6.66797 12.9502 6.53332 12.937 6.41102 12.8862C6.28873 12.8354 6.18432 12.7494 6.11112 12.639C6.03792 12.5287 5.99924 12.399 6.00001 12.2666Z"
-                    fill="#FF7991"
-                  />
-                </svg>
-              }
-            />
+          <div className="pagination">
+            {/* Display total count */}
+            <button
+              className="previous"
+              onClick={handlePreviousPage}
+              disabled={pageIndex === 1}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="17"
+                viewBox="0 0 16 17"
+                fill="none"
+              >
+                <path
+                  d="M9.99999 12.3228L9.99999 4.87611C10.0008 4.74369 9.96208 4.61405 9.88888 4.5037C9.81568 4.39335 9.71127 4.30731 9.58898 4.25653C9.46668 4.20575 9.33203 4.19254 9.2022 4.21859C9.07237 4.24464 8.95324 4.30876 8.85999 4.40278L5.13999 8.12944C5.01582 8.25435 4.94613 8.42332 4.94613 8.59944C4.94613 8.77557 5.01582 8.94454 5.13999 9.06944L8.85999 12.7961C8.95324 12.8901 9.07237 12.9543 9.2022 12.9803C9.33203 13.0063 9.46668 12.9931 9.58898 12.9424C9.71127 12.8916 9.81568 12.8055 9.88888 12.6952C9.96208 12.5848 10.0008 12.4552 9.99999 12.3228Z"
+                  fill="#FF7991"
+                />
+              </svg>
+            </button>
+            <div className="page-index">
+              <p>Page: </p>
+              <p className="page-index-p">{pageIndex}</p>
+            </div>
+            <button className="next" onClick={handleNextPage}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="17"
+                viewBox="0 0 16 17"
+                fill="none"
+              >
+                <path
+                  d="M6.00001 4.48289V11.9296C5.99924 12.062 6.03792 12.1916 6.11112 12.302C6.18432 12.4123 6.28873 12.4984 6.41102 12.5491C6.53332 12.5999 6.66797 12.6131 6.7978 12.5871C6.92763 12.561 7.04676 12.4969 7.14001 12.4029L10.86 8.67622C10.9842 8.55131 11.0539 8.38234 11.0539 8.20622C11.0539 8.0301 10.9842 7.86113 10.86 7.73622L7.14001 4.00955C7.04676 3.91553 6.92763 3.85141 6.7978 3.82537C6.66797 3.79932 6.53332 3.81253 6.41102 3.86331C6.28873 3.91408 6.18432 4.00013 6.11112 4.11048C6.03792 4.22082 5.99924 4.35047 6.00001 4.48289Z"
+                  fill="#FF7991"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       </div>

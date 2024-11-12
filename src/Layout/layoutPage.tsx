@@ -14,11 +14,14 @@ const LayoutPage: React.FunctionComponent = (props) => {
   // console.log(token);
 
   const user = useRecoilValue(userState);
+  const users = user.userInfo;
   // console.log(user.userInfo.name);
   const userId = user.userInfo.id;
   // console.log(userId);
   const userName = user.userInfo.name;
-  // console.log(userName);
+  // console.log(users);
+
+  const avatar = user.userInfo.avatar;
 
   const login = async () => {
     try {
@@ -30,6 +33,7 @@ const LayoutPage: React.FunctionComponent = (props) => {
         }
       );
       // toast.success("Đăng nhập thành công!");
+      console.log("Đăng nhập thành công!");
 
       // Saving token to cookies
       document.cookie = `Authorization=${data.resources.accessToken}; path=/`;
@@ -42,8 +46,42 @@ const LayoutPage: React.FunctionComponent = (props) => {
     }
   };
 
+  const handleFormSubmit = async () => {
+    try {
+      await axios.post(
+        "https://checking-event.dion.vn/account/api/UpdateAccount",
+        {
+          name: userName,
+          photo: avatar,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Cập nhập thành công!");
+    } catch (error) {
+      console.error("Error submitting registration:", error);
+      // Xử lý lỗi, hiển thị thông báo cho người dùng, v.v.
+    }
+  };
+
+  // useEffect(() => {
+  //   login();
+  //   handleFormSubmit();
+  // }, []);
+
   useEffect(() => {
-    login();
+    const executeAfterLogin = async () => {
+      await login();
+      setTimeout(() => {
+        handleFormSubmit();
+      }, 20000);
+    };
+
+    executeAfterLogin();
   }, []);
 
   return (

@@ -28,7 +28,7 @@ interface Sponsor {
 const ListKolsPage: React.FunctionComponent = () => {
   const navigate = useNavigate();
 
-  const [openTab, setOpenTab] = useState<number>(2); // Default to Cục bông
+  const [openTab, setOpenTab] = useState<number>(3); // Default to Cục bông
   const [sponsor, setSponsor] = useState<Sponsor[]>([]);
   const [kols, setKols] = useState<Kol[]>([]);
   const [allKols, setAllKols] = useState<{ [key: number]: Kol[] }>({}); // Store KOLs by category
@@ -51,7 +51,7 @@ const ListKolsPage: React.FunctionComponent = () => {
         });
 
         setAllKols(groupedKols);
-        setKols(groupedKols[1001] || []); // Initialize with "Cục bông" (key: 1001)
+        setKols(groupedKols[1002] || []); // Initialize with "Cục bông" (key: 1001)
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -76,7 +76,13 @@ const ListKolsPage: React.FunctionComponent = () => {
   };
 
   const filterKols = (tabId: number) => {
-    setKols(allKols[tabId === 2 ? 1001 : 1002] || []);
+    setKols(allKols[tabId === 3 ? 1002 : 1001] || []);
+  };
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const handleSearch = () => {
+    navigate(`/search?search=${encodeURIComponent(searchTerm)}`);
   };
 
   // console.log(allKols);
@@ -108,9 +114,10 @@ const ListKolsPage: React.FunctionComponent = () => {
       </div>
 
       <div>
-        <Link to="">
-          <img src="https://dion.vn/wp-content/uploads/2024/07/banner.png" />
-        </Link>
+        <img
+          src="https://dion.vn/wp-content/uploads/2024/09/banner.jpg"
+          className="w-full"
+        />
       </div>
       <div className="px-4 py-[10px] flex flex-col gap-4">
         <div className="flex flex-row items-center">
@@ -198,7 +205,43 @@ const ListKolsPage: React.FunctionComponent = () => {
           </div>
         </div>
 
-        <div className="kols-top flex flex-row items-center gap-[10px]"></div>
+        <div className="kols-top flex flex-row items-center gap-[10px]">
+          <div className="w-full mx-auto">
+            <label
+              htmlFor="default-search"
+              className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+            >
+              Search
+            </label>
+            <div className="relative">
+              <input
+                type="search"
+                id="default-search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-xl bg-gray-50 placeholder:text-[#000] focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Tìm kiếm"
+                required
+              />
+              <button onClick={handleSearch}>
+                <div className="text-white absolute end-1.5 bottom-[28px] bg-[#FF7991]  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-xl text-sm p-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                  >
+                    <path
+                      d="M17.0413 16.4521L13.786 13.1968C14.7852 12.0575 15.3364 10.6159 15.3364 9.08643C15.3364 7.41691 14.6862 5.84749 13.5058 4.66707C12.3254 3.48665 10.7559 2.83643 9.08643 2.83643C7.41691 2.83643 5.84749 3.48665 4.66707 4.66707C3.48665 5.84749 2.83643 7.41691 2.83643 9.08643C2.83643 10.7559 3.48665 12.3254 4.66707 13.5058C5.84749 14.6862 7.41691 15.3364 9.08643 15.3364C10.6159 15.3364 12.0575 14.7852 13.1968 13.786L16.4521 17.0413C16.5335 17.1227 16.6401 17.1634 16.7467 17.1634C16.8534 17.1634 16.96 17.1227 17.0413 17.0413C17.2041 16.8786 17.2041 16.6149 17.0413 16.4521ZM5.25627 12.9166C4.23332 11.8934 3.66976 10.5332 3.66976 9.08643C3.66976 7.63969 4.23332 6.27942 5.25627 5.25627C6.27942 4.23332 7.63969 3.66976 9.08643 3.66976C10.5332 3.66976 11.8934 4.23332 12.9166 5.25627C13.9395 6.27942 14.5031 7.63969 14.5031 9.08643C14.5031 10.5332 13.9395 11.8934 12.9166 12.9166C11.8934 13.9395 10.5332 14.5031 9.08643 14.5031C7.63969 14.5031 6.27942 13.9395 5.25627 12.9166Z"
+                      fill="white"
+                    />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <div className="list-kols">
           <div className="page-1">
@@ -237,163 +280,151 @@ const ListKolsPage: React.FunctionComponent = () => {
                 <div>
                   <div className="kols-top flex flex-row items-center gap-[10px] py-[20px]">
                     {/* KOL Top 2 */}
-                    <Link to={`/kols-detail/${kols[1].id}`}>
-                      <div className="kols-top-2 w-full">
-                        <div className="img-kols-top max-h-[110.468px]">
-                          <img
-                            src={
-                              kols[1]
-                                ? `https://checking-event.dion.vn${kols[1].photo}`
-                                : "/path/to/default-image.jpg"
-                            }
-                            alt={
-                              kols[1] ? kols[1].name : "KOL không có dữ liệu"
-                            }
-                            className="h-full w-full rounded-md"
-                          />
-                        </div>
-                        <div className="connet-kols-top">
-                          <p className="text-[10px] text-[#000] font-normal text-center">
-                            Điểm bình chọn
-                          </p>
-                          <samp className="text-[12.756px] text-[#FF7991] font-bold text-center">
-                            {kols[1]?.totalVotesPerKol || "N/A"}
-                          </samp>
-                          <h4 className="text-[10.934px] text-[#000] overflow-hidden h-[33px] font-normal text-center uppercase">
-                            {kols[1]?.name || "Không có dữ liệu"}
-                          </h4>
-                          <p className="text-[10.934px] text-[#000] font-medium text-center uppercase">
-                            SBD: {kols[1]?.number || "N/A"}
-                          </p>
-                        </div>
-                        <div className="icon-category">
-                          <div className="icon-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="30"
-                              height="30"
-                              viewBox="0 0 30 30"
-                              fill="none"
-                            >
-                              <ellipse
-                                cx="14.9059"
-                                cy="15"
-                                rx="14.4791"
-                                ry="15"
-                                fill="#FFDA4B"
-                              />
-                            </svg>
+                    {kols[1] && (
+                      <Link to={`/kols-detail/${kols[1].id}`}>
+                        <div className="kols-top-2 w-full">
+                          <div className="img-kols-top max-h-[110.468px] w-full aspect-square">
+                            <img
+                              src={`https://checking-event.dion.vn${kols[1].photo}`}
+                              alt={kols[1].name}
+                              className="h-full w-full rounded-md"
+                            />
                           </div>
-                          <div className="icon-2 text-stroke-custom">2</div>
+                          <div className="connet-kols-top">
+                            <p className="text-[10px] text-[#000] font-normal text-center">
+                              Điểm bình chọn
+                            </p>
+                            <samp className="text-[12.756px] text-[#FF7991] font-bold text-center">
+                              {kols[1]?.totalVotesPerKol || "N/A"}
+                            </samp>
+                            <h4 className="text-[10.934px] text-[#000] overflow-hidden h-[33px] font-normal text-center uppercase">
+                              {kols[1]?.name || "Không có dữ liệu"}
+                            </h4>
+                            <p className="text-[10.934px] text-[#000] font-medium text-center uppercase">
+                              SBD: {kols[1]?.number || "N/A"}
+                            </p>
+                          </div>
+                          <div className="icon-category">
+                            <div className="icon-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="30"
+                                viewBox="0 0 30 30"
+                                fill="none"
+                              >
+                                <ellipse
+                                  cx="14.9059"
+                                  cy="15"
+                                  rx="14.4791"
+                                  ry="15"
+                                  fill="#FFDA4B"
+                                />
+                              </svg>
+                            </div>
+                            <div className="icon-2 text-stroke-custom">2</div>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    )}
 
                     {/* KOL Top 1 */}
-                    <Link to={`/kols-detail/${kols[0].id}`}>
-                      <div className="kols-top-1 w-full">
-                        <div className="img-kols-top max-h-[140.314px] min-w-[120px]">
-                          <img
-                            src={
-                              kols[0]
-                                ? `https://checking-event.dion.vn${kols[0].photo}`
-                                : "/path/to/default-image.jpg"
-                            }
-                            alt={
-                              kols[0] ? kols[0].name : "KOL không có dữ liệu"
-                            }
-                            className="w-full h-full rounded-md"
-                          />
-                        </div>
-                        <div className="connet-kols-top">
-                          <p className="text-[10px] text-[#000] font-normal text-center">
-                            Điểm bình chọn
-                          </p>
-                          <samp className="text-[16px] text-[#FF7991] font-bold text-center">
-                            {kols[0]?.totalVotesPerKol || "N/A"}
-                          </samp>
-                          <h4 className="text-[14px] text-[#000] font-normal overflow-hidden text-center uppercase">
-                            {kols[0]?.name || "Không có dữ liệu"}
-                          </h4>
-                          <p className="text-[14px] text-[#000] font-medium text-center uppercase">
-                            SBD: {kols[0]?.number || "N/A"}
-                          </p>
-                        </div>
-                        <div className="icon-category">
-                          <div className="icon-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="30"
-                              height="30"
-                              viewBox="0 0 30 30"
-                              fill="none"
-                            >
-                              <ellipse
-                                cx="14.5641"
-                                cy="15"
-                                rx="14.4791"
-                                ry="15"
-                                fill="#FF7991"
-                              />
-                            </svg>
+                    {kols[0] && (
+                      <Link to={`/kols-detail/${kols[0].id}`}>
+                        <div className="kols-top-1 w-full">
+                          <div className="img-kols-top max-h-[140.314px] min-w-[120px] w-full aspect-square">
+                            <img
+                              src={`https://checking-event.dion.vn${kols[0].photo}`}
+                              alt={kols[0].name}
+                              className="w-full h-full rounded-md"
+                            />
                           </div>
-                          <div className="icon-2 text-stroke-custom">1</div>
+                          <div className="connet-kols-top">
+                            <p className="text-[10px] text-[#000] font-normal text-center">
+                              Điểm bình chọn
+                            </p>
+                            <samp className="text-[16px] text-[#FF7991] font-bold text-center">
+                              {kols[0]?.totalVotesPerKol || "N/A"}
+                            </samp>
+                            <h4 className="text-[14px] text-[#000] font-normal overflow-hidden max-h-[33px] text-center uppercase">
+                              {kols[0]?.name || "Không có dữ liệu"}
+                            </h4>
+                            <p className="text-[14px] text-[#000] font-medium text-center uppercase">
+                              SBD: {kols[0]?.number || "N/A"}
+                            </p>
+                          </div>
+                          <div className="icon-category">
+                            <div className="icon-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="30"
+                                viewBox="0 0 30 30"
+                                fill="none"
+                              >
+                                <ellipse
+                                  cx="14.5641"
+                                  cy="15"
+                                  rx="14.4791"
+                                  ry="15"
+                                  fill="#FF7991"
+                                />
+                              </svg>
+                            </div>
+                            <div className="icon-2 text-stroke-custom">1</div>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    )}
 
                     {/* KOL Top 3 */}
-                    <Link to={`/kols-detail/${kols[2].id}`}>
-                      <div className="kols-top-3 w-full">
-                        <div className="img-kols-top max-h-[110.468px]">
-                          <img
-                            src={
-                              kols[2]
-                                ? `https://checking-event.dion.vn${kols[2].photo}`
-                                : "/path/to/default-image.jpg"
-                            }
-                            alt={
-                              kols[2] ? kols[2].name : "KOL không có dữ liệu"
-                            }
-                            className="h-full w-full rounded-md"
-                          />
-                        </div>
-                        <div className="connet-kols-top">
-                          <p className="text-[10px] text-[#000] font-normal text-center">
-                            Điểm bình chọn
-                          </p>
-                          <samp className="text-[12.756px] text-[#FF7991] font-bold text-center">
-                            {kols[2]?.totalVotesPerKol || "N/A"}
-                          </samp>
-                          <h4 className="text-[10.934px] text-[#000] font-normal text-center uppercase">
-                            {kols[2]?.name || "Không có dữ liệu"}
-                          </h4>
-                          <p className="text-[10.934px] text-[#000] font-medium text-center uppercase">
-                            SBD: {kols[2]?.number || "N/A"}
-                          </p>
-                        </div>
-                        <div className="icon-category">
-                          <div className="icon-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="30"
-                              height="30"
-                              viewBox="0 0 30 30"
-                              fill="none"
-                            >
-                              <ellipse
-                                cx="14.9059"
-                                cy="15"
-                                rx="14.4791"
-                                ry="15"
-                                fill="#1FBDC6"
-                              />
-                            </svg>
+                    {kols[2] && (
+                      <Link to={`/kols-detail/${kols[2].id}`}>
+                        <div className="kols-top-3 w-full">
+                          <div className="img-kols-top max-h-[110.468px] w-full aspect-square">
+                            <img
+                              src={`https://checking-event.dion.vn${kols[2].photo}`}
+                              alt={kols[2].name}
+                              className="h-full w-full rounded-md"
+                            />
                           </div>
-                          <div className="icon-2 text-stroke-custom">3</div>
+                          <div className="connet-kols-top">
+                            <p className="text-[10px] text-[#000] font-normal text-center">
+                              Điểm bình chọn
+                            </p>
+                            <samp className="text-[12.756px] text-[#FF7991] font-bold text-center">
+                              {kols[2]?.totalVotesPerKol || "N/A"}
+                            </samp>
+                            <h4 className="text-[10.934px] text-[#000] font-normal text-center uppercase">
+                              {kols[2]?.name || "Không có dữ liệu"}
+                            </h4>
+                            <p className="text-[10.934px] text-[#000] font-medium text-center uppercase">
+                              SBD: {kols[2]?.number || "N/A"}
+                            </p>
+                          </div>
+                          <div className="icon-category">
+                            <div className="icon-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="30"
+                                viewBox="0 0 30 30"
+                                fill="none"
+                              >
+                                <ellipse
+                                  cx="14.9059"
+                                  cy="15"
+                                  rx="14.4791"
+                                  ry="15"
+                                  fill="#1FBDC6"
+                                />
+                              </svg>
+                            </div>
+                            <div className="icon-2 text-stroke-custom">3</div>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-4 items-center pt-[20px]">
@@ -403,10 +434,10 @@ const ListKolsPage: React.FunctionComponent = () => {
                         className="card-kols w-full rounded-xl flex flex-row"
                         key={kol.id}
                       >
-                        <div className="max-w-[150px]">
+                        <div className="max-w-[150px] w-full aspect-square">
                           <img
                             className="w-full h-full rounded-xl"
-                            src={`${BaseURL}${kol.photo}`}
+                            src={`https://checking-event.dion.vn${kol.photo}`}
                             alt={kol.name}
                           />
                         </div>
@@ -450,163 +481,151 @@ const ListKolsPage: React.FunctionComponent = () => {
                 <div>
                   <div className="kols-top flex flex-row items-center gap-[10px] py-[20px]">
                     {/* KOL Top 2 */}
-                    <Link to={`/kols-detail/${kols[1].id}`}>
-                      <div className="kols-top-2 w-full">
-                        <div className="img-kols-top max-h-[110.468px]">
-                          <img
-                            src={
-                              kols[1]
-                                ? `https://checking-event.dion.vn${kols[1].photo}`
-                                : "/path/to/default-image.jpg"
-                            }
-                            alt={
-                              kols[1] ? kols[1].name : "KOL không có dữ liệu"
-                            }
-                            className="w-full h-full rounded-md"
-                          />
-                        </div>
-                        <div className="connet-kols-top">
-                          <p className="text-[10px] text-[#000] font-normal text-center">
-                            Điểm bình chọn
-                          </p>
-                          <samp className="text-[12.756px] text-[#FF7991] font-bold text-center">
-                            {kols[1]?.totalVotesPerKol || "N/A"}
-                          </samp>
-                          <h4 className="text-[10.934px] text-[#000] h-[33px] overflow-hidden font-normal text-center uppercase">
-                            {kols[1]?.name || "Không có dữ liệu"}
-                          </h4>
-                          <p className="text-[10.934px] text-[#000] font-medium text-center uppercase">
-                            SBD: {kols[1]?.number || "N/A"}
-                          </p>
-                        </div>
-                        <div className="icon-category">
-                          <div className="icon-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="30"
-                              height="30"
-                              viewBox="0 0 30 30"
-                              fill="none"
-                            >
-                              <ellipse
-                                cx="14.9059"
-                                cy="15"
-                                rx="14.4791"
-                                ry="15"
-                                fill="#FFDA4B"
-                              />
-                            </svg>
+                    {kols[1] && (
+                      <Link to={`/kols-detail/${kols[1].id}`}>
+                        <div className="kols-top-2 w-full">
+                          <div className="img-kols-top max-h-[110.468px] w-full aspect-square">
+                            <img
+                              src={`https://checking-event.dion.vn${kols[1].photo}`}
+                              alt={kols[1].name}
+                              className="h-full w-full rounded-md"
+                            />
                           </div>
-                          <div className="icon-2 text-stroke-custom">2</div>
+                          <div className="connet-kols-top">
+                            <p className="text-[10px] text-[#000] font-normal text-center">
+                              Điểm bình chọn
+                            </p>
+                            <samp className="text-[12.756px] text-[#FF7991] font-bold text-center">
+                              {kols[1]?.totalVotesPerKol || "N/A"}
+                            </samp>
+                            <h4 className="text-[10.934px] text-[#000] overflow-hidden h-[33px] font-normal text-center uppercase">
+                              {kols[1]?.name || "Không có dữ liệu"}
+                            </h4>
+                            <p className="text-[10.934px] text-[#000] font-medium text-center uppercase">
+                              SBD: {kols[1]?.number || "N/A"}
+                            </p>
+                          </div>
+                          <div className="icon-category">
+                            <div className="icon-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="30"
+                                viewBox="0 0 30 30"
+                                fill="none"
+                              >
+                                <ellipse
+                                  cx="14.9059"
+                                  cy="15"
+                                  rx="14.4791"
+                                  ry="15"
+                                  fill="#FFDA4B"
+                                />
+                              </svg>
+                            </div>
+                            <div className="icon-2 text-stroke-custom">2</div>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    )}
 
                     {/* KOL Top 1 */}
-                    <Link to={`/kols-detail/${kols[0].id}`}>
-                      <div className="kols-top-1 w-full">
-                        <div className="img-kols-top max-h-[140.314px] min-w-[120px]">
-                          <img
-                            src={
-                              kols[0]
-                                ? `https://checking-event.dion.vn${kols[0].photo}`
-                                : "/path/to/default-image.jpg"
-                            }
-                            alt={
-                              kols[0] ? kols[0].name : "KOL không có dữ liệu"
-                            }
-                            className="w-full h-full rounded-md"
-                          />
-                        </div>
-                        <div className="connet-kols-top">
-                          <p className="text-[10px] text-[#000] font-normal text-center">
-                            Điểm bình chọn
-                          </p>
-                          <samp className="text-[16px] text-[#FF7991] font-bold text-center">
-                            {kols[0]?.totalVotesPerKol || "N/A"}
-                          </samp>
-                          <h4 className="text-[14px] text-[#000] font-normal overflow-hidden max-h-[33px] text-center uppercase">
-                            {kols[0]?.name || "Không có dữ liệu"}
-                          </h4>
-                          <p className="text-[14px] text-[#000] font-medium text-center uppercase">
-                            SBD: {kols[0]?.number || "N/A"}
-                          </p>
-                        </div>
-                        <div className="icon-category">
-                          <div className="icon-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="30"
-                              height="30"
-                              viewBox="0 0 30 30"
-                              fill="none"
-                            >
-                              <ellipse
-                                cx="14.5641"
-                                cy="15"
-                                rx="14.4791"
-                                ry="15"
-                                fill="#FF7991"
-                              />
-                            </svg>
+                    {kols[0] && (
+                      <Link to={`/kols-detail/${kols[0].id}`}>
+                        <div className="kols-top-1 w-full">
+                          <div className="img-kols-top max-h-[140.314px] min-w-[120px] w-full aspect-square">
+                            <img
+                              src={`https://checking-event.dion.vn${kols[0].photo}`}
+                              alt={kols[0].name}
+                              className="w-full h-full rounded-md"
+                            />
                           </div>
-                          <div className="icon-2 text-stroke-custom">1</div>
+                          <div className="connet-kols-top">
+                            <p className="text-[10px] text-[#000] font-normal text-center">
+                              Điểm bình chọn
+                            </p>
+                            <samp className="text-[16px] text-[#FF7991] font-bold text-center">
+                              {kols[0]?.totalVotesPerKol || "N/A"}
+                            </samp>
+                            <h4 className="text-[14px] text-[#000] font-normal overflow-hidden max-h-[33px] text-center uppercase">
+                              {kols[0]?.name || "Không có dữ liệu"}
+                            </h4>
+                            <p className="text-[14px] text-[#000] font-medium text-center uppercase">
+                              SBD: {kols[0]?.number || "N/A"}
+                            </p>
+                          </div>
+                          <div className="icon-category">
+                            <div className="icon-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="30"
+                                viewBox="0 0 30 30"
+                                fill="none"
+                              >
+                                <ellipse
+                                  cx="14.5641"
+                                  cy="15"
+                                  rx="14.4791"
+                                  ry="15"
+                                  fill="#FF7991"
+                                />
+                              </svg>
+                            </div>
+                            <div className="icon-2 text-stroke-custom">1</div>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    )}
 
                     {/* KOL Top 3 */}
-                    <Link to={`/kols-detail/${kols[2].id}`}>
-                      <div className="kols-top-3 w-full">
-                        <div className="img-kols-top max-h-[110.468px]">
-                          <img
-                            src={
-                              kols[2]
-                                ? `https://checking-event.dion.vn${kols[2].photo}`
-                                : "/path/to/default-image.jpg"
-                            }
-                            alt={
-                              kols[2] ? kols[2].name : "KOL không có dữ liệu"
-                            }
-                            className="w-full h-full rounded-md"
-                          />
-                        </div>
-                        <div className="connet-kols-top">
-                          <p className="text-[10px] text-[#000] font-normal text-center">
-                            Điểm bình chọn
-                          </p>
-                          <samp className="text-[12.756px] text-[#FF7991] font-bold text-center">
-                            {kols[2]?.totalVotesPerKol || "N/A"}
-                          </samp>
-                          <h4 className="text-[10.934px] text-[#000] font-normal text-center uppercase">
-                            {kols[2]?.name || "Không có dữ liệu"}
-                          </h4>
-                          <p className="text-[10.934px] text-[#000] font-medium text-center uppercase">
-                            SBD: {kols[2]?.number || "N/A"}
-                          </p>
-                        </div>
-                        <div className="icon-category">
-                          <div className="icon-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="30"
-                              height="30"
-                              viewBox="0 0 30 30"
-                              fill="none"
-                            >
-                              <ellipse
-                                cx="14.9059"
-                                cy="15"
-                                rx="14.4791"
-                                ry="15"
-                                fill="#1FBDC6"
-                              />
-                            </svg>
+                    {kols[2] && (
+                      <Link to={`/kols-detail/${kols[2].id}`}>
+                        <div className="kols-top-3 w-full">
+                          <div className="img-kols-top max-h-[110.468px] w-full aspect-square">
+                            <img
+                              src={`https://checking-event.dion.vn${kols[2].photo}`}
+                              alt={kols[2].name}
+                              className="h-full w-full rounded-md"
+                            />
                           </div>
-                          <div className="icon-2 text-stroke-custom">3</div>
+                          <div className="connet-kols-top">
+                            <p className="text-[10px] text-[#000] font-normal text-center">
+                              Điểm bình chọn
+                            </p>
+                            <samp className="text-[12.756px] text-[#FF7991] font-bold text-center">
+                              {kols[2]?.totalVotesPerKol || "N/A"}
+                            </samp>
+                            <h4 className="text-[10.934px] text-[#000] font-normal text-center uppercase">
+                              {kols[2]?.name || "Không có dữ liệu"}
+                            </h4>
+                            <p className="text-[10.934px] text-[#000] font-medium text-center uppercase">
+                              SBD: {kols[2]?.number || "N/A"}
+                            </p>
+                          </div>
+                          <div className="icon-category">
+                            <div className="icon-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="30"
+                                viewBox="0 0 30 30"
+                                fill="none"
+                              >
+                                <ellipse
+                                  cx="14.9059"
+                                  cy="15"
+                                  rx="14.4791"
+                                  ry="15"
+                                  fill="#1FBDC6"
+                                />
+                              </svg>
+                            </div>
+                            <div className="icon-2 text-stroke-custom">3</div>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-4 items-center pt-[20px]">
@@ -616,10 +635,10 @@ const ListKolsPage: React.FunctionComponent = () => {
                         className="card-kols w-full rounded-xl flex flex-row"
                         key={kol.id}
                       >
-                        <div className="max-w-[150px]">
+                        <div className="max-w-[150px] w-full aspect-square">
                           <img
                             className="w-full h-full rounded-xl"
-                            src={`${BaseURL}${kol.photo}`}
+                            src={`https://checking-event.dion.vn${kol.photo}`}
                             alt={kol.name}
                           />
                         </div>
@@ -656,7 +675,7 @@ const ListKolsPage: React.FunctionComponent = () => {
                   </div>
                 </div>
               ) : (
-                <p></p>
+                <p></p> // Debug message
               )}
             </div>
           </div>
@@ -667,9 +686,80 @@ const ListKolsPage: React.FunctionComponent = () => {
             <img src="https://dion.vn/wp-content/uploads/2024/07/03.png" />
             <img
               className="h-5"
-              src="https://dion.vn/wp-content/uploads/2024/07/Doi-tac-khach-hang.png"
+              src="https://dion.vn/wp-content/uploads/2024/09/vinh.png"
             />
           </div>
+          <h3 className="text-[#FF7991] text-lg text-base font-bold text-center">
+            Đơn vị đồng tổ chức
+          </h3>
+
+          <img
+            src="https://dion.vn/wp-content/uploads/2024/09/bioamicus2.png"
+            className="w-full h-full rounded-xl border border-[#0000003b]"
+          />
+
+          <h3 className="text-[#FF7991] text-lg text-base font-bold text-center">
+            Đơn vị đồng hành
+          </h3>
+
+          <Swiper
+            modules={[Navigation, Pagination]}
+            // centeredSlides={true}
+            spaceBetween={20}
+            slidesPerView={3}
+            navigation
+            pagination={{ clickable: true }}
+          >
+            <SwiperSlide>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="https://dion.vn/wp-content/uploads/2024/09/natureisway.png"
+                  className="w-full h-full rounded-xl border border-[#0000003b]"
+                />
+                <img
+                  src="https://dion.vn/wp-content/uploads/2024/09/motaro.png"
+                  className="w-full h-full rounded-xl border border-[#0000003b]"
+                />
+              </div>
+            </SwiperSlide>
+            <SwiperSlide>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="https://dion.vn/wp-content/uploads/2024/09/midkid.png"
+                  className="w-full h-full rounded-xl border border-[#0000003b]"
+                />
+                <img
+                  src="https://dion.vn/wp-content/uploads/2024/09/jonzac-2.png"
+                  className="w-full h-full rounded-xl border border-[#0000003b]"
+                />
+              </div>
+            </SwiperSlide>
+            <SwiperSlide>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="https://dion.vn/wp-content/uploads/2024/09/atono.png"
+                  className="w-full h-full rounded-xl border border-[#0000003b]"
+                />
+                <img
+                  src="https://dion.vn/wp-content/uploads/2024/09/bioamicus.png"
+                  className="w-full h-full rounded-xl border border-[#0000003b]"
+                />
+              </div>
+            </SwiperSlide>
+            <SwiperSlide>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="https://dion.vn/wp-content/uploads/2024/09/photo_2024-09-09_09-50-05.jpg"
+                  className="w-full h-full rounded-xl border border-[#0000003b]"
+                />
+                <img
+                  src="https://dion.vn/wp-content/uploads/2024/09/photo_2024-09-09_09-50-13.jpg"
+                  className="w-full h-full rounded-xl border border-[#0000003b]"
+                />
+              </div>
+            </SwiperSlide>
+          </Swiper>
+          {/*           
           <Swiper
             modules={[Navigation, Pagination]}
             spaceBetween={20}
@@ -717,7 +807,7 @@ const ListKolsPage: React.FunctionComponent = () => {
                   </SwiperSlide>
                 );
               })}
-          </Swiper>
+          </Swiper> */}
         </div>
 
         <div className="slider-partner">
@@ -732,7 +822,7 @@ const ListKolsPage: React.FunctionComponent = () => {
             <h3 className="text-[#000] text-base font-bold text-center">
               Tổng giá giá trị giải thưởng lên đến:
               <br />
-              <span className="text-[#FF7991] text-lg">300.000.000 VND</span>
+              <span className="text-[#FF7991] text-lg">200.000.000 VND</span>
             </h3>
 
             <h3 className="text-[#FF7991] text-base font-bold">Thể lệ:</h3>
@@ -758,18 +848,18 @@ const ListKolsPage: React.FunctionComponent = () => {
             <ul className="list-disc pl-4">
               <li>
                 <p className="font-normal text-base text-[#000] text-justify">
-                  Vòng 1 (từ tháng 8 - 30/9): Casting Photo (Tìm ra Top 100)
+                  Vòng 1 (5/9 - 15/10): Casting Photo (Tìm ra Top 100)
                 </p>
               </li>
               <li>
                 <p className="font-normal text-base text-[#000] text-justify">
-                  Vòng 2 (từ 10/10 - 30/10): Training short video (Tìm ra Top
+                  Vòng 2 (từ 15/10 - 12/11): Training short video (Tìm ra Top
                   30)
                 </p>
               </li>
               <li>
                 <p className="font-normal text-base text-[#000] text-justify">
-                  Vòng 3 (17/11): Tập làm Đại sứ thương hiệu
+                  Vòng 3 (23/11): Tập làm Đại sứ thương hiệu
                 </p>
               </li>
               <li>
@@ -785,7 +875,7 @@ const ListKolsPage: React.FunctionComponent = () => {
             <ul className="list-disc pl-4">
               <li>
                 <p className="font-normal text-base text-[#000] text-justify">
-                  Vòng 1 (từ tháng 8 - 30/11): Casting Photo (Chọn ra Top 10)
+                  Vòng 1 (5/9 - 30/11): Casting Photo (Chọn ra Top 10)
                 </p>
               </li>
               <li>

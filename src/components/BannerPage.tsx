@@ -9,7 +9,7 @@ const BannerPage: React.FunctionComponent = (props) => {
       </div> */}
       <div className="py-4">
         <Link to="kols-page">
-          <img src="https://dion.vn/wp-content/uploads/2024/07/banner.png" />
+          <img src="https://dion.vn/wp-content/uploads/2024/09/banner.jpg" />
         </Link>
       </div>
     </div>
